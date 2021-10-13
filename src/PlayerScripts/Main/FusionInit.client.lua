@@ -52,7 +52,7 @@ end)
 --\\ Handle Buttons
 
 local Buttons do
-	local BUTTON_AMOUNT = 0
+	local ButtonAmount = 0
 
 	Buttons = {
 		{
@@ -77,13 +77,13 @@ local Buttons do
 
 	for _, buttonData in ipairs(Buttons) do
 		if buttonData.IsEnabled then
-			BUTTON_AMOUNT += 1
+			ButtonAmount += 1
 		end
 	end
 
 	local buttonInstances = {}
 
-	local NextPos = -45 * (BUTTON_AMOUNT - 1) / 2
+	local NextPos = -45 * (ButtonAmount - 1) / 2
 
 	for i, buttonData in ipairs(Buttons) do
 		local Button = nil
