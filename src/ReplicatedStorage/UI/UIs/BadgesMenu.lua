@@ -16,8 +16,6 @@ local OnEvent = Fusion.OnEvent
 local Computed = Fusion.Computed
 local State = Fusion.State
 
-
-local Menu
 local List = New "ScrollingFrame" {
 	Name = "List",
 
@@ -40,6 +38,7 @@ local List = New "ScrollingFrame" {
 	}
 }
 
+local Menu
 Menu = New "Frame" {
 	Name = "BadgesMenu",
 

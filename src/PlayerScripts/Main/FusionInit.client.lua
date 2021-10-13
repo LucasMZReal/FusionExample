@@ -83,11 +83,7 @@ local Buttons do
 
 	local buttonInstances = {}
 
-	local IsButtonCountPar = BUTTON_AMOUNT % 2 == 0
-	local NextPos = IsButtonCountPar
-		and -45 / 2
-		or (BUTTON_AMOUNT == 1) and 0
-		or -45
+	local NextPos = -45 * (BUTTON_AMOUNT - 1) / 2
 
 	for i, buttonData in ipairs(Buttons) do
 		local Button = nil
