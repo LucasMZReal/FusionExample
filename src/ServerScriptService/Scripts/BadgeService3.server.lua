@@ -17,7 +17,7 @@ local function OnPlayerAdded(player)
 	local badgeProfile = BadgeService3:LoadProfile(player, profile.Data.Badges)
 	BadgeDataUpdated:FireClient(player, badgeProfile.Data)
 
-	badgeProfile:OnUpdate(function(badgeData)
+	badgeProfile.OnUpdate:Connect(function(badgeData)
 		BadgeDataUpdated:FireClient(player, badgeData)
 
 		profile.Data.Badges = badgeData

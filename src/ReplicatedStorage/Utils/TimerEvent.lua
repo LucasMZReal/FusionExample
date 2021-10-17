@@ -1,6 +1,6 @@
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ScriptSignal = require(ReplicatedStorage.Utils.Signal.SimpleDeferred)
+local ScriptSignal = require(ReplicatedStorage.Utils.Signal)
 
 local TimerEvent = {}
 local Timers = {}
