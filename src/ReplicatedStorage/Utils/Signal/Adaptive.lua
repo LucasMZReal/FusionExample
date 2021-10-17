@@ -61,31 +61,19 @@
 local IsDeferred: boolean do
 	IsDeferred = false
 
-	local thread = coroutine.running()
-
 	local bindable = Instance.new("BindableEvent")
+
+	local handlerRun = false
 	bindable.Event:Connect(function()
-		-- Last connection ran
-
-		task.defer(thread)
-	end)
-
-	local connection = bindable.Event:Connect(function()
-		-- Second connection ran
-
-		IsDeferred = true
-	end)
-
-	bindable.Event:Connect(function()
-		-- First connection ran
-
-		connection:Disconnect()
+		handlerRun = true
 	end)
 
 	bindable:Fire()
-
-	coroutine.yield()
 	bindable:Destroy()
+
+	if handlerRun == false then
+		IsDeferred = true
+	end
 end
 
 local ScriptSignal = {}
@@ -101,7 +89,10 @@ if IsDeferred then
 else
 	local FreeThread: thread? = nil
 
-	local function RunHandler(handle, ...)
+	local function RunHandlerInFreeThread(
+		handle: (...any) -> (),
+		...
+	)
 		local thread = FreeThread :: thread
 		FreeThread = nil
 
@@ -110,17 +101,20 @@ else
 		FreeThread = thread
 	end
 
-	local function RunHandlerInFreeThread(...)
-		RunHandler(...)
+	local function CreateFreeThread()
+		FreeThread = coroutine.running()
 
 		while true do
-			RunHandler( coroutine.yield() )
+			RunHandlerInFreeThread( coroutine.yield() )
 		end
 	end
 
-	function RunListener(handle, ...)
+	function RunListener(
+		handle: (...any) -> (),
+		...
+	)
 		if FreeThread == nil then
-			FreeThread = coroutine.create(RunHandlerInFreeThread)
+			task.spawn(CreateFreeThread)
 		end
 
 		task.spawn(
@@ -131,7 +125,7 @@ else
 end
 
 -- Creates a ScriptSignal object
-function ScriptSignal.new(): Class
+function ScriptSignal.new()
 	return setmetatable({
 		_active = true,
 		_head = nil
@@ -146,8 +140,7 @@ end
 -- Connects a function to the ScriptSignal object
 function ScriptSignal:Connect(
 	handle: (...any) -> ()
-): ScriptConnection
-
+)
 	assert(
 		typeof(handle) == 'function',
 		"Must be function"
@@ -296,15 +289,14 @@ function ScriptConnection:Disconnect()
 	_node._connection = nil
 	self._node = nil
 end
-
 ScriptConnection.Destroy = ScriptConnection.Disconnect
 
 export type Class = typeof(
-	setmetatable({}, ScriptSignal)
+	ScriptSignal.new()
 )
 
 export type ScriptConnection = typeof(
-	setmetatable({Connected = true}, ScriptConnection)
+	ScriptSignal.new():Connect(function() end)
 )
 
 return ScriptSignal

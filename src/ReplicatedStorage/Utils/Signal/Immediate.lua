@@ -66,7 +66,10 @@ ScriptConnection.__index = ScriptConnection
 
 local FreeThread: thread? = nil
 
-local function RunHandler(handle, ...)
+local function RunHandlerInFreeThread(
+	handle: (...any) -> (),
+	...
+)
 	local thread = FreeThread :: thread
 	FreeThread = nil
 
@@ -75,16 +78,16 @@ local function RunHandler(handle, ...)
 	FreeThread = thread
 end
 
-local function RunHandlerInFreeThread(...)
-	RunHandler(...)
+local function CreateFreeThread()
+	FreeThread = coroutine.running()
 
 	while true do
-		RunHandler( coroutine.yield() )
+		RunHandlerInFreeThread( coroutine.yield() )
 	end
 end
 
 -- Creates a ScriptSignal object
-function ScriptSignal.new(): Class
+function ScriptSignal.new()
 	return setmetatable({
 		_active = true,
 		_head = nil
@@ -99,8 +102,7 @@ end
 -- Connects a function to the ScriptSignal object
 function ScriptSignal:Connect(
 	handle: (...any) -> ()
-): ScriptConnection
-
+)
 	assert(
 		typeof(handle) == 'function',
 		"Must be function"
@@ -190,13 +192,12 @@ function ScriptSignal:Fire(...)
 	while node ~= nil do
 		if node._connection ~= nil then
 			if FreeThread == nil then
-				FreeThread = coroutine.create(RunHandlerInFreeThread)
+				task.spawn(CreateFreeThread)
 			end
 
 			task.spawn(
 				FreeThread :: thread,
-				node._handle,
-				...
+				node._handle, ...
 			)
 		end
 
@@ -257,15 +258,14 @@ function ScriptConnection:Disconnect()
 	_node._connection = nil
 	self._node = nil
 end
-
 ScriptConnection.Destroy = ScriptConnection.Disconnect
 
 export type Class = typeof(
-	setmetatable({}, ScriptSignal)
+	ScriptSignal.new()
 )
 
 export type ScriptConnection = typeof(
-	setmetatable({Connected = true}, ScriptConnection)
+	ScriptSignal.new():Connect(function() end)
 )
 
 return ScriptSignal
