@@ -294,8 +294,6 @@ function BadgeService3:WaitForProfile(player)
 			end
 		end))
 
-		Instance.new("Part")
-
 		maid:Add(OnBadgeProfileLoaded:Connect(function(profile)
 			if maid:WasCleaned() then
 				return
