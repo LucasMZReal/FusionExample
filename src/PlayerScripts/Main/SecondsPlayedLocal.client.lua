@@ -1,8 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
+local WaitForChild = require(ReplicatedStorage.Utils.BetterWaitForChild)
 local Stamper = require(ReplicatedStorage.Utils.Stamper)
 local Remotes = require(ReplicatedStorage.Utils.Remotes)
+
 local PlayerSecondsPlayedLoaded = Remotes.GetRemoteEvent(
 	"PlayerSecondsPlayedLoaded"
 )
@@ -11,7 +13,7 @@ local PlayerList = {}
 
 PlayerSecondsPlayedLoaded.OnClientEvent:Connect(
 	function(player, timePlayedInfo)
-		local leaderstats = player:WaitForChild("leaderstats")
+		local leaderstats: Folder = WaitForChild(player, "leaderstats")
 
 		if player.Parent ~= Players then
 			return

@@ -1,12 +1,16 @@
 -- ReplicatedDestroy.lua
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+
+local WaitForChild = require(ReplicatedStorage.Utils.BetterWaitForChild)
+
 local IsServer: boolean = RunService:IsServer()
 local IsClient: boolean = RunService:IsClient()
 
 local Remote: RemoteEvent do
 	if IsClient then
-		Remote = script:WaitForChild("Replicator")
+		Remote = WaitForChild(script, "Replicator")
 
 		Remote.OnClientEvent:Connect(function(instance: Instance)
 			if instance == nil then

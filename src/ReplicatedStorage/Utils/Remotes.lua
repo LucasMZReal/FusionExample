@@ -1,18 +1,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local RemotesFolder = ReplicatedStorage.Remotes
+local WaitForChild = require(ReplicatedStorage.Utils.BetterWaitForChild)
 
+local RemotesFolder = ReplicatedStorage.Remotes
 local Remotes = {}
 
 -- (yields) Gets a RemoteFunction
 function Remotes.GetRemoteEvent(name: string): RemoteEvent
-	return RemotesFolder.Events:WaitForChild(name)
+	return WaitForChild(RemotesFolder.Events, name)
 end
 
 -- (yields) Gets a RemoteFunction
 function Remotes.GetRemoteFunction(name: string): RemoteFunction
-	return RemotesFolder.Functions:WaitForChild(name)
+	return WaitForChild(RemotesFolder.Functions, name)
 end
 
 if RunService:IsServer() then
