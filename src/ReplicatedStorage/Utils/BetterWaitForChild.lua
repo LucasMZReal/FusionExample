@@ -1,47 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Janitor = require(ReplicatedStorage.Utils.Janitor)
 
-local Yielder do
-	Yielder = {}
-	Yielder.__index = Yielder
-
-	function Yielder.new(): Yielder
-		return setmetatable({
-			_thread = nil
-		}, Yielder)
-	end
-
-	function Yielder:IsYielding(): boolean
-		return self._thread ~= nil
-	end
-
-	function Yielder:Yield(): (...any)
-		if self._thread ~= nil then
-			error("Cannot yield two threads at once", 2)
-		end
-
-		self._thread = coroutine.running()
-
-		return coroutine.yield()
-	end
-
-	function Yielder:Resume(...)
-		local thread = self._thread
-
-		if thread == nil then
-			error("No thread to resume", 2)
-		end
-
-		self._thread = nil
-
-		task.spawn(thread, ...)
-	end
-
-	type Yielder = typeof(
-		setmetatable({}, Yielder)
-	)
-end
-
 return function(
 	parent: Instance,
 	childName: string
@@ -64,39 +23,29 @@ return function(
 		end
 	end
 
-	local yielder = Yielder.new()
 	local masterJanitor = Janitor.new()
+	local thread = coroutine.running()
+	local wasResumed = false
 
 	local function addListeners(child: Instance)
 		local instanceJanitor = Janitor.new()
 		masterJanitor:Add(instanceJanitor, "Destroy", child)
 
-		local nameChangedConnection: RBXScriptConnection
-		nameChangedConnection = instanceJanitor:Add(
+		instanceJanitor:Add(
 			child:GetPropertyChangedSignal("Name"):Connect(function()
-				if nameChangedConnection.Connected == false then
+				if Janitor.Is(instanceJanitor) == false then
 					return
 				end
 
-				if not yielder:IsYielding() then
+				if wasResumed then
 					return
 				end
 
 				if child.Name == childName then
-					masterJanitor:Destroy()
-					yielder:Resume(child)
-				end
-			end), "Disconnect"
-		)
+					masterJanitor:Cleanup()
 
-		instanceJanitor:Add(
-			child.AncestryChanged:Connect(function(_, _parent)
-				if not yielder:IsYielding() then
-					return
-				end
-
-				if _parent ~= parent then
-					masterJanitor:Remove(child)
+					wasResumed = true
+					task.spawn(thread, child)
 				end
 			end), "Disconnect"
 		)
@@ -108,18 +57,30 @@ return function(
 
 	masterJanitor:Add(
 		parent.ChildAdded:Connect(function(child: Instance)
-			if not yielder:IsYielding() then
+			if wasResumed then
 				return
 			end
 
 			if child.Name == childName then
-				masterJanitor:Destroy()
-				yielder:Resume(child)
+				masterJanitor:Cleanup()
+
+				wasResumed = true
+				task.spawn(thread, child)
 			else
 				addListeners(child)
 			end
 		end), "Disconnect"
 	)
 
-	return yielder:Yield()
+	masterJanitor:Add(
+		parent.ChildRemoved:Connect(function(child: Instance)
+			if wasResumed then
+				return
+			end
+
+			masterJanitor:Remove(child)
+		end), "Disconnect"
+	)
+
+	return coroutine.yield()
 end

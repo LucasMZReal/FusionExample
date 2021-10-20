@@ -107,7 +107,7 @@ function ProfileHandler.WaitForProfile(player)
 			end
 
 			if removedPlayer == player then
-				janitor:Destroy()
+				janitor:Cleanup()
 
 				wasResumed = true
 				task.spawn(thread, nil)
@@ -120,7 +120,7 @@ function ProfileHandler.WaitForProfile(player)
 			end
 
 			if _player == player then
-				janitor:Destroy()
+				janitor:Cleanup()
 
 				wasResumed = true
 				task.spawn(thread, profile)

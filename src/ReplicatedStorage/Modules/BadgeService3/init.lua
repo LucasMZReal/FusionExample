@@ -290,7 +290,7 @@ function BadgeService3:WaitForProfile(player)
 			end
 
 			if removedPlayer == player then
-				janitor:Destroy()
+				janitor:Cleanup()
 
 				wasResumed = true
 				task.spawn(thread, nil)
@@ -303,7 +303,7 @@ function BadgeService3:WaitForProfile(player)
 			end
 
 			if profile._player == player then
-				janitor:Destroy()
+				janitor:Cleanup()
 
 				wasResumed = true
 				task.spawn(thread, profile)
