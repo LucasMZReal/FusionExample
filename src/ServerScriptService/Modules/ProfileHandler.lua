@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local ProfileService = require(ServerScriptService.Modules.ProfileService)
-local ConnectionCleaner = require(ReplicatedStorage.Utils.ConnectionCleaner)
+local Janitor = require(ReplicatedStorage.Utils.Janitor)
 local Signal = require(ReplicatedStorage.Utils.Signal)
 local Remotes = require(ReplicatedStorage.Utils.Remotes)
 
@@ -97,28 +97,32 @@ function ProfileHandler.WaitForProfile(player)
 
 	local thread do
 		thread = coroutine.running()
+		local wasResumed = false
 
-		local cleaner = ConnectionCleaner.new()
+		local janitor = Janitor.new()
 
-		cleaner:Add(Players.PlayerRemoving:Connect(function(removedPlayer)
-			if cleaner:WasCleaned() then
+		janitor:Add(Players.PlayerRemoving:Connect(function(removedPlayer)
+			if wasResumed then
 				return
 			end
 
 			if removedPlayer == player then
-				cleaner:Cleanup()
+				janitor:Destroy()
+
+				wasResumed = true
 				task.spawn(thread, nil)
 			end
 		end))
 
-		cleaner:Add(OnProfileLoaded:Connect(function(_player, profile)
-			if cleaner:WasCleaned() then
+		janitor:Add(OnProfileLoaded:Connect(function(_player, profile)
+			if wasResumed then
 				return
 			end
 
 			if _player == player then
-				cleaner:Cleanup()
+				janitor:Destroy()
 
+				wasResumed = true
 				task.spawn(thread, profile)
 			end
 		end))

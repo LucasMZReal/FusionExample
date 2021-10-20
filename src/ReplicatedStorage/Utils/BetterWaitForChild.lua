@@ -65,11 +65,14 @@ return function(
 	end
 
 	local yielder = Yielder.new()
-	local janitor = Janitor.new()
+	local masterJanitor = Janitor.new()
 
 	local function addListeners(child: Instance)
+		local instanceJanitor = Janitor.new()
+		masterJanitor:Add(instanceJanitor, "Destroy", child)
+
 		local nameChangedConnection: RBXScriptConnection
-		nameChangedConnection = janitor:Add(
+		nameChangedConnection = instanceJanitor:Add(
 			child:GetPropertyChangedSignal("Name"):Connect(function()
 				if nameChangedConnection.Connected == false then
 					return
@@ -80,22 +83,20 @@ return function(
 				end
 
 				if child.Name == childName then
-					janitor:Cleanup()
+					masterJanitor:Destroy()
 					yielder:Resume(child)
 				end
 			end), "Disconnect"
 		)
 
-		local ancestryChangedConnection: RBXScriptConnection
-		ancestryChangedConnection = janitor:Add(
-			child.AncestryChanged:Connect(function()
+		instanceJanitor:Add(
+			child.AncestryChanged:Connect(function(_, _parent)
 				if not yielder:IsYielding() then
 					return
 				end
 
-				if child.Parent ~= parent then
-					nameChangedConnection:Disconnect()
-					ancestryChangedConnection:Disconnect()
+				if _parent ~= parent then
+					masterJanitor:Remove(child)
 				end
 			end), "Disconnect"
 		)
@@ -105,14 +106,14 @@ return function(
 		addListeners(child)
 	end
 
-	janitor:Add(
+	masterJanitor:Add(
 		parent.ChildAdded:Connect(function(child: Instance)
 			if not yielder:IsYielding() then
 				return
 			end
 
 			if child.Name == childName then
-				janitor:Cleanup()
+				masterJanitor:Destroy()
 				yielder:Resume(child)
 			else
 				addListeners(child)

@@ -117,7 +117,7 @@ local Settings = {
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local Maid = require(ReplicatedStorage.Utils.ConnectionCleaner)
+local Janitor = require(ReplicatedStorage.Utils.Janitor)
 local Signal = require(ReplicatedStorage.Utils.Signal)
 local Badges = require(script.Badges)
 
@@ -190,8 +190,9 @@ local function GetNotificationData(badgeId)
 			imageURL = badgeImageUrl
 		end
 	else
-		imageURL =	Settings.UsesGoldBadgeNotification and 'rbxassetid://206410289'
-					or Settings.DefaultBadgeNotificationImage
+		imageURL =	Settings.UsesGoldBadgeNotification
+			and 'rbxassetid://206410289'
+			or Settings.DefaultBadgeNotificationImage
 	end
 
 	return {
@@ -279,29 +280,32 @@ function BadgeService3:WaitForProfile(player)
 
 	local thread do
 		thread = coroutine.running()
+		local wasResumed = false
 
-		local maid = Maid.new()
+		local janitor = Janitor.new()
 
-		maid:Add(Players.PlayerRemoving:Connect(function(removedPlayer)
-			if maid:WasCleaned() then
+		janitor:Add(Players.PlayerRemoving:Connect(function(removedPlayer)
+			if wasResumed then
 				return
 			end
 
 			if removedPlayer == player then
-				maid:Cleanup()
+				janitor:Destroy()
 
+				wasResumed = true
 				task.spawn(thread, nil)
 			end
 		end))
 
-		maid:Add(OnBadgeProfileLoaded:Connect(function(profile)
-			if maid:WasCleaned() then
+		janitor:Add(OnBadgeProfileLoaded:Connect(function(profile)
+			if wasResumed then
 				return
 			end
 
 			if profile._player == player then
-				maid:Cleanup()
+				janitor:Destroy()
 
+				wasResumed = true
 				task.spawn(thread, profile)
 			end
 		end))
