@@ -3,8 +3,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AllBadges = require(ReplicatedStorage.Modules.BadgeService3.Badges)
 local OwnedBadges = {}
 
-local Remotes = require(ReplicatedStorage.Utils.Remotes)
-local BadgeDataUpdated = Remotes.GetRemoteEvent("BadgeDataUpdated")
+local RemoteService = require(ReplicatedStorage.Utils.RemoteService)
+local BadgeDataUpdated = RemoteService.GetRemoteEvent("BadgeDataUpdated")
 
 local UIShared = require(ReplicatedStorage.UI.Shared)
 local OnMenuClosed = UIShared.OnMenuClosed

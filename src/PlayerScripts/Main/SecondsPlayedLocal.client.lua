@@ -3,9 +3,9 @@ local Players = game:GetService("Players")
 
 local WaitForChild = require(ReplicatedStorage.Utils.BetterWaitForChild)
 local Stamper = require(ReplicatedStorage.Utils.Stamper)
-local Remotes = require(ReplicatedStorage.Utils.Remotes)
+local RemoteService = require(ReplicatedStorage.Utils.RemoteService)
 
-local PlayerSecondsPlayedLoaded = Remotes.GetRemoteEvent(
+local PlayerSecondsPlayedLoaded = RemoteService.GetRemoteEvent(
 	"PlayerSecondsPlayedLoaded"
 )
 

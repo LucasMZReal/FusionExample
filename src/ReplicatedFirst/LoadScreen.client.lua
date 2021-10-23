@@ -10,9 +10,9 @@ end
 
 local QuickTween = require(ReplicatedStorage.Utils.QuickTween)
 local Stamper = require(ReplicatedStorage.Utils.Stamper)
-local Remotes = require(ReplicatedStorage.Utils.Remotes)
+local RemoteService = require(ReplicatedStorage.Utils.RemoteService)
 local TweenInfos = require(ReplicatedStorage.TweenInfos)
-local PlayerDataLoaded = Remotes.GetRemoteEvent("PlayerDataLoaded")
+local PlayerDataLoaded = RemoteService.GetRemoteEvent("PlayerDataLoaded")
 
 local Fusion = require(ReplicatedStorage.Utils.Fusion)
 local New = Fusion.New

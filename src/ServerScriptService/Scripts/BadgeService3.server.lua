@@ -3,9 +3,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ProfileHandler = require(ServerScriptService.Modules.ProfileHandler)
 local BadgeService3 = require(ReplicatedStorage.Modules.BadgeService3)
-local Remotes = require(ReplicatedStorage.Utils.Remotes)
+local RemoteService = require(ReplicatedStorage.Utils.RemoteService)
 
-local BadgeDataUpdated = Remotes.GetRemoteEvent("BadgeDataUpdated")
+local BadgeDataUpdated = RemoteService.GetRemoteEvent("BadgeDataUpdated")
 
 local function OnPlayerAdded(player)
 	local profile = ProfileHandler.WaitForProfile(player)

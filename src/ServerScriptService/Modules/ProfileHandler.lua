@@ -5,9 +5,9 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ProfileService = require(ServerScriptService.Modules.ProfileService)
 local Janitor = require(ReplicatedStorage.Utils.Janitor)
 local Signal = require(ReplicatedStorage.Utils.Signal)
-local Remotes = require(ReplicatedStorage.Utils.Remotes)
+local RemoteService = require(ReplicatedStorage.Utils.RemoteService)
 
-local PlayerDataLoaded = Remotes.GetRemoteEvent("PlayerDataLoaded")
+local PlayerDataLoaded = RemoteService.GetRemoteEvent("PlayerDataLoaded")
 
 local ProfileStore = ProfileService.GetProfileStore("PlayerData", {
 	SecondsPlayed = 0,

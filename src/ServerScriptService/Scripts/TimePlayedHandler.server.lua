@@ -6,9 +6,11 @@ local RunService = game:GetService("RunService")
 local BadgeService3 = require(ReplicatedStorage.Modules.BadgeService3)
 local ProfileHandler = require(ServerScriptService.Modules.ProfileHandler)
 local Stamper = require(ReplicatedStorage.Utils.Stamper)
-local Remotes = require(ReplicatedStorage.Utils.Remotes)
+local RemoteService = require(ReplicatedStorage.Utils.RemoteService)
 
-local PlayerSecondsPlayedLoaded = Remotes.GetRemoteEvent("PlayerSecondsPlayedLoaded")
+local PlayerSecondsPlayedLoaded = RemoteService.GetRemoteEvent(
+	"PlayerSecondsPlayedLoaded"
+)
 
 local PLAYER_PROFILES = {}
 
