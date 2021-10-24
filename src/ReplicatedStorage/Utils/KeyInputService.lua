@@ -1,6 +1,6 @@
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Signal = require(ReplicatedStorage.Utils.Signal.Immediate)
+local Signal = require(ReplicatedStorage.Utils.Signal)
 
 local KeyEvents = {}
 local KeyInputService = {}
@@ -18,7 +18,6 @@ local function GetKeyEvent(keyCode: Enum.KeyCode)
 
 	return keyEvent
 end
-
 
 function KeyInputService.ConnectToKeyCode(
 	keyCode: Enum.KeyCode,
