@@ -75,7 +75,7 @@ local function runCleanupTasks()
 	end
 end
 
-RunService.Heartbeat:Connect(runCleanupTasks)
+--RunService.Heartbeat:Connect(runCleanupTasks)
 
 local function cleanupOnDestroy(instance: Instance, task: cleanup.Task): (() -> ())
 	-- set up connection so we can check if the instance is alive
