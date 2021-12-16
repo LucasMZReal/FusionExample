@@ -1,5 +1,5 @@
 --[[
-	A custom BindToClose implementation which fixes these issues:
+	A custom BindToCloseSignal implementation which fixes these issues:
 
 		* Has a :Disconnect method
 		* Listeners run in a different order:
@@ -14,23 +14,23 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ScriptSignal = require(ReplicatedStorage.Utils.Signal.Immediate)
 -- Must be an immediate mode signal! I am using FastSignal Immediate, you can use GoodSignal.
 
-local BindToClose = ScriptSignal.new()
+local BindToCloseSignal = ScriptSignal.new()
 local HandlerClosed = ScriptSignal.new()
 local ActiveHandlers = 0
 
 game:BindToClose(function()
-	BindToClose:Fire()
+	BindToCloseSignal:Fire()
 
 	while ActiveHandlers > 0 do
 		HandlerClosed:Wait()
 	end
 end)
 
-return function(
+local function BindToClose(
 	handler: () -> ()
 ): ScriptSignal.ScriptConnection
 
-	return BindToClose:Connect(function()
+	return BindToCloseSignal:Connect(function()
 		ActiveHandlers += 1
 
 		local connection
@@ -65,3 +65,5 @@ return function(
 		end)
 	end)
 end
+
+return BindToClose

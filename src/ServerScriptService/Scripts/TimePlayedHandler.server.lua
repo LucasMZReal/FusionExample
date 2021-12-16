@@ -42,11 +42,9 @@ local function OnPlayerAdded(player: Player)
 		PLAYER_PROFILES[player] = nil
 	end)
 
-	do
-		local leaderstats = Instance.new("Folder")
-		leaderstats.Name = 'leaderstats'
-		leaderstats.Parent = player
-	end
+	local leaderstats = Instance.new("Folder")
+	leaderstats.Name = 'leaderstats'
+	leaderstats.Parent = player
 
 	local playerData = {
 		profile.Data,
