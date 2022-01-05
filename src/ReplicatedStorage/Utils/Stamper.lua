@@ -44,10 +44,10 @@ function ScriptConnection:Disconnect()
 end
 
 export type ScriptConnection = typeof(
-	setmetatable({}, ScriptConnection)
+	setmetatable({Connected = true}, ScriptConnection)
 )
 
-RunService.Heartbeat:Connect(function(frameDeltaTime: number)
+RunService.Heartbeat:Connect(function(frameDeltaTime)
 	TimePassed += frameDeltaTime
 
 	local node = NextEvent
