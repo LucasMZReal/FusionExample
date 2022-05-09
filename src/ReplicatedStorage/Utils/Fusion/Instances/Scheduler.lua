@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-type
 --[[
 	Defers and orders UI data binding updates.
 ]]

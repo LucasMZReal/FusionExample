@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local RunService = game:GetService("RunService")
 
+local PlayerJanitor = require(ReplicatedStorage.Utils.PlayerJanitor)
 local BadgeService3 = require(ReplicatedStorage.Modules.BadgeService3)
 local ProfileHandler = require(ServerScriptService.Modules.ProfileHandler)
 local Stamper = require(ReplicatedStorage.Utils.Stamper)
@@ -33,6 +34,7 @@ local HIGHEST_AWARD_INDEX = #AWARDS
 local function OnPlayerAdded(player: Player)
 	local profile = ProfileHandler.WaitForProfile(player)
 	local badgeProfile = BadgeService3:WaitForProfile(player)
+	local playerJanitor = PlayerJanitor.GetJanitorFrom(player)
 
 	if not profile then
 		return
@@ -67,6 +69,10 @@ local function OnPlayerAdded(player: Player)
 	end
 	PLAYER_PROFILES[player] = playerData
 
+	playerJanitor:Add(function()
+		PLAYER_PROFILES[player] = nil
+	end)
+
 	PlayerSecondsPlayedLoaded:FireAllClients(
 		player,
 		{
@@ -81,10 +87,6 @@ Players.PlayerAdded:Connect(OnPlayerAdded)
 for _, player in ipairs(Players:GetPlayers()) do
 	task.defer(OnPlayerAdded, player)
 end
-
-Players.PlayerRemoving:Connect(function(player)
-	PLAYER_PROFILES[player] = nil
-end)
 
 Stamper(1, function(deltaTime)
 	for _, data in pairs(PLAYER_PROFILES) do
